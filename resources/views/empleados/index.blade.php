@@ -48,8 +48,7 @@
                                             si
                                         @endif
                                 </td>
-                                <td class="p-3"> {{$emple->archivo}}</td>
-
+                                <td class="p-3">{{$emple->archivo}}</td>
 
                                 <td class="p-3 flex justify-center">
 

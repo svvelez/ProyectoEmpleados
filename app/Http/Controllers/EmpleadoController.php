@@ -46,13 +46,14 @@ return view('empleados.index',compact('empleados'));
         if ($validator->fails()) {
             return response()->json(['success' => 'false', 'mensaje' => $validator->errors()->first()]);
         }
-        $emplead = Emplead::create([
+        $emplead = Emple::create([
             'nombre'=>$request->nombre,
             'email'=>$request->email,
             'sexo'=>$request->sexo,
             'area_id'=>$request->area_id,
             'boletin'=>$request->boletin,
-            'descripcion'=>$request->descripcion
+            'descripcion'=>$request->descripcion,
+            'archivo'=> "",
         ]);
         foreach ($request->roles as $rol) {
             $emplerol = EmpleRol::create([
@@ -61,7 +62,7 @@ return view('empleados.index',compact('empleados'));
 
             ]);
         }
-        return $request;
+        return response()->json(['success' => 'true', 'mensaje' =>'hola']);
     }
 
 
