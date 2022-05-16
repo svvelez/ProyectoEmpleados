@@ -9,13 +9,11 @@
             <a href="{{route('empleados.create')}}" class="btn btn-primary me-md-2" type="button" id="agregar"><i
                     class="fas fa-user-plus"></i>Agregar</a>
        </div>
-
         <div class="modal-content">
             <div class="overflow-auto lg:overflow-visible">
+               <div class="text-center flex-auto">
 
-                <div class="text-center flex-auto">
-
-                        <table id="tabemp" class="table table-striped display nowrap" style="width:100%">
+                        <table id="tabemp" class="table table-striped display nowrap"  style="width:100%">
                         <thead class="bg-green-600 text-black">
                         <tr>
                            <th><i class="fas fa-user"></i>Nombre</th>
@@ -39,7 +37,7 @@
                                 <td class="p-3 ">{{$emple->nombre}}</td>
                                 <td class="p-3">{{$emple->email}}</td>
                                 <td class="p-3">{{$emple->sexo}}</td>
-                                <td class="p-3"> {{$emple->areas->nombre}}</td>
+                                <td class="p-3">{{$emple->areas->nombre}}</td>
                                 <td class="p-3">
                                     @if($emple->boletin==0)
                                       no
@@ -48,31 +46,46 @@
                                             si
                                         @endif
                                 </td>
-                                <td class="p-3">{{$emple->archivo}}</td>
+                               <td class="p-3 flex justify-center">
+                                   <a href="" class="text-black-400 hover:text-gray-100 mx-2" data-bs-toggle="modal" data-bs-target="{{"#exampleModal".$emple->id }}" data-bs-whatever="@getbootstrap">
+                                       <i class="fas fa-eye"></i>
+                                   </a>
+                                   <div class="modal fade" id="{{"exampleModal".$emple->id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                       <div class="modal-dialog modal-fullscreen-sm-down">
+                                           <div class="modal-content">
+                                               <div class="modal-header">
+                                                   <h5 class="modal-title" id="exampleModalLabel">Archivo</h5>
+                                                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                               </div>
+
+                                               <div class="modal-body">
+                                               <iframe src="{{asset('storage').'/'.$emple->archivo}}" alt="" Width="450" Height="400">
+                                               </iframe>
+
+                                               </div>
+
+                                           </div>
+                                       </div>
+                                   </div>
+                               </td>
 
                                 <td class="p-3 flex justify-center">
-
-                                    <a href="{{ route('empleados.edit',$emple->id) }}"
+                                  <a href="{{ route('empleados.edit',$emple->id) }}"
                                        class="text-black-400 hover:text-gray-100 mx-2">
                                         <i class="fas fa-pen-to-square"></i>
                                     </a>
-
                                 </td>
 
                                 <td class="p-3 flex justify-center">
-
                                     <form action="{{ route('empleados.destroy',$emple->id)}}"
                                           class="d-inline formulario-eliminar" method="post">
                                         @method('DELETE')
                                         @csrf
                                         <button type="submit" class="fas fa-trash-can"></button>
                                     </form>
-
-                                </td>
-
+                               </td>
                             </tr>
-
-                        @endforeach
+                       @endforeach
 
                         </tbody>
                     </table>
@@ -84,17 +97,18 @@
     <script>
         $(document).ready(function () {
 
-            $('#tabemp').DataTable({
+            $('#tabemp').dataTable({
                 "searching": false,
                 "aLengthMenu": false,
                 "paging": false,
-
                 "Info": false,
                 "scrollY":200,
                 "scrollCollapse": true,
                 "scrollX": true,
-
-
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy','excel', 'pdf', 'print'
+                ]
 
         /*  pageLength : 5,
           lengthMenu: [[5, 10, 20, -1], [5, 10, 20, 'Todos']],

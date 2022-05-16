@@ -13,7 +13,9 @@
                 </i>Empleados</a>
         </div>
         <div class="modal-content">
+
             <form action="{{route('empleados.store')}}" id="formulario_enviar" method="POST"
+                  enctype="multipart/form-data"
                   class="bg-white w-1/3 p-4 border-gray-100 shadow-xl rounded-lg">
                 <h2 class="modal-title" id="exampleModalLabel">Crear empleado</h2>
 
@@ -136,7 +138,7 @@
 
                     <div class="mb-3">
                         <label for="archivo" class="form-label">Archivo*</label>
-                        <input class="form-control form-control-file" name="archivo" type="file" id="archivo" >
+                        <input class="form-control form-control-file" name="archivo" type="file" id="archivo">
                     </div>
 
                     @error('archivo')
@@ -144,20 +146,26 @@
                         * {{$message}}</p>
                     @enderror
 
-                    <button type="button" id="enviar"
+                    <button type="submit" id="enviar"
                             class="my-3 w-full btn btn-outline-primary p-2 font-semibold rounded text-black hover:bg-600 ">
                         Guardar
                     </button>
-
 
             </form>
 
 
             <script>
                 $(document).ready(function () {
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });
+                    $("#formulario_enviar").submit(function (e) {
+                        e.preventDefault();
 
+                        var formulario = new FormData(this);
 
-                    $("#enviar").click(function () {
 
                         var boletinCheck = document.getElementById('boletinCheck');
                         var boletin = document.getElementById('boletin');
@@ -165,14 +173,13 @@
                         if (boletinCheck.checked == false) {
                             boletin.value = 0;
                         }
-
-                        var formulario =$("#formulario_enviar").serialize();
-
                         $.ajax({
-                            url: '{{ route('empleados.store') }}',
-                            data: formulario,
                             type: 'POST',
-                            dataType: 'json',
+                            url: "{{url('empleados')}}",
+                            data: formulario,
+                            cache: false,
+                            contentType: false,
+                            processData: false,
                             success: function (data) {
                                 console.log(data);
 
@@ -190,13 +197,15 @@
                             error: function (json, xhr, status) {
                                 swal.fire(" ¡Empleado no registrado! ",
                                     "Complete toda la informacion y valide los datos", "error");
-                            },
+                            }
                         });
                     });
 
                 });
 
             </script>
-
-
 @endsection
+
+
+
+

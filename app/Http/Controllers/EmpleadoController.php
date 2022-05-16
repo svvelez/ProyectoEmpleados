@@ -2,37 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use Faker\Core\File;
 use Illuminate\Http\Request;
 use App\Models\Emple;
 use App\Models\Area;
 use App\Models\Role;
 use App\Models\EmpleRol;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Validator;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TestMail;
 
 class EmpleadoController extends Controller
 {
 
-    public function index()
+   public function index()
     {
-
-        $empleados = Emple::all();
-return view('empleados.index',compact('empleados'));
-
+       $empleados = Emple::all();
+        return view('empleados.index', compact('empleados'));
     }
-
     public function create()
     {
-
-     $empleados = Emple::all();
-
-     /*$areas = Area::pluck('nombre','id'); */
-     $areas =Area::all();
-     $roles =Role::all();
-     $emplerol = EmpleRol::all();
-
-        return view('empleados.create',compact('areas','empleados','roles','emplerol'));
-
+        $empleados = Emple::all();
+        /*$areas = Area::pluck('nombre','id'); */
+        $areas = Area::all();
+        $roles = Role::all();
+        $emplerol = EmpleRol::all();
+        return view('empleados.create', compact('areas', 'empleados', 'roles', 'emplerol'));
     }
 
     public function store(Request $request)
@@ -41,19 +38,23 @@ return view('empleados.index',compact('empleados'));
         $empleadoValidate = new Emple();
         $validator = validator()->make($request->all(), $empleadoValidate->rules, $empleadoValidate->messages);
 
-        //dd($validator);
-
         if ($validator->fails()) {
             return response()->json(['success' => 'false', 'mensaje' => $validator->errors()->first()]);
         }
+
+        if ($request->hasFile('archivo')) {
+            $path = $request->file('archivo')->store('archivos');
+        }
+
         $emplead = Emple::create([
-            'nombre'=>$request->nombre,
-            'email'=>$request->email,
-            'sexo'=>$request->sexo,
-            'area_id'=>$request->area_id,
-            'boletin'=>$request->boletin,
-            'descripcion'=>$request->descripcion,
-            'archivo'=> "",
+            'nombre' => $request->nombre,
+            'email' => $request->email,
+            'sexo' => $request->sexo,
+            'area_id' => $request->area_id,
+            'boletin' => $request->boletin,
+            'descripcion' => $request->descripcion,
+            'archivo' => $path
+
         ]);
         foreach ($request->roles as $rol) {
             $emplerol = EmpleRol::create([
@@ -62,65 +63,56 @@ return view('empleados.index',compact('empleados'));
 
             ]);
         }
-        return response()->json(['success' => 'true', 'mensaje' =>'hola']);
+        return response()->json(['success' => 'true', 'mensaje' => 'hola']);
     }
-
-
 
     public function show($id)
     {
-        return view('empleados.show',compact('id'));
-
+        return view('empleados.show', compact('id'));
     }
-
 
     public function edit($id)
     {
         /* dd($id); */
-         $empleados = Emple::findOrFail($id);
-         $areas =Area::all();
+        $empleados = Emple::findOrFail($id);
+        $areas = Area::all();
         $roles = Role::all();
-        $rolesEmpleado =  DB::table('empleadosrol')->where('empleado_id', $id)->get();
-
-
-        return view('empleados.edit',compact('empleados','areas','roles','rolesEmpleado'));
-
-    }
-
+        $rolesEmpleado = DB::table('empleadosrol')->where('empleado_id', $id)->get();
+        return view('empleados.edit', compact('empleados', 'areas', 'roles', 'rolesEmpleado'));
+   }
 
     public function update(Request $request, $id)
     {
-
         //Validación de reglas
         $empleadoValidate = new Emple();
         $validator = validator()->make($request->all(), $empleadoValidate->rules, $empleadoValidate->messages);
 
-        //dd($validator);
-
-        if ($validator->fails()) {
+       if ($validator->fails()) {
             return response()->json(['success' => 'false', 'mensaje' => $validator->errors()->first()]);
+        }
+        if ($request->hasFile('archivo')) {
+            $path = $request->file('archivo')->store('archivos');
         }
         $emplead = Emple::findOrFail($id);
         $emplead->update([
-              'nombre'=>$request->nombre,
-              'email'=>$request->email,
-              'sexo'=>$request->sexo,
-              'area_id'=>$request->area_id,
-              'boletin'=>$request->boletin,
-              'descripcion'=>$request->descripcion
+            'nombre' => $request->nombre,
+            'email' => $request->email,
+            'sexo' => $request->sexo,
+            'area_id' => $request->area_id,
+            'boletin' => $request->boletin,
+            'descripcion' => $request->descripcion,
+            'archivo' => $path
         ]);
-        EmpleRol::where('empleado_id',$emplead->id)->delete();
+        EmpleRol::where('empleado_id', $emplead->id)->delete();
 
-        foreach ($request->roles as $rol){
+        foreach ($request->roles as $rol) {
             $emplerol = EmpleRol::create([
-                'rol_id'=>$rol,
-                'empleado_id'=>$emplead->id
+                'rol_id' => $rol,
+                'empleado_id' => $emplead->id
 
             ]);
         }
-
-        return response()->json(['success' => 'true', 'mensaje' =>'hola']);
-
+        return response()->json(['success' => 'true', 'mensaje' => 'hola']);
     }
 
 
@@ -130,6 +122,7 @@ return view('empleados.index',compact('empleados'));
 
         $emplead->delete();
 
-        return redirect()->route('empleados.index')->with('eliminar','ok');
+        return redirect()->route('empleados.index')->with('eliminar', 'ok');
     }
+
 }

@@ -14,10 +14,11 @@
 
         <div class="modal-content">
             <form action="{{ route('empleados.update',$empleados->id) }}" id="form" method="POST"
+                  enctype="multipart/form-data"
                   class="bg-white w-1/3 p-4 border-gray-100 shadow-xl rounded-lg">
 
                 @csrf
-                @method('PUT')
+                @method('PATCH')
                 <h2 class="text-2x1 text-center py-4 mb-4 font-semibold">Editar Empleado {{$empleados->nombre}}</h2>
 
                 <div class="mb-3">
@@ -94,25 +95,30 @@
                     @foreach($roles as $rol)
 
                         <div class="sm-10">
-                       <div class="form-check">
-           <input type="checkbox" name="roles[]"  value="{{$rol->id}}"
-                  @foreach($rolesEmpleado as $rolEmpleado)
-                                @if($rolEmpleado->rol_id ==$rol->id) checked @endif
-               @endforeach>{{$rol->nombre}}
-
-
-
-
-                       </div>
-
-
-                          </div>
+                            <div class="form-check">
+                                <input type="checkbox" name="roles[]" value="{{$rol->id}}"
+                                       @foreach($rolesEmpleado as $rolEmpleado)
+                                       @if($rolEmpleado->rol_id ==$rol->id) checked @endif
+                                    @endforeach>{{$rol->nombre}}
+                            </div>
+                        </div>
 
                     @endforeach
                 </fieldset>
+                <div class="mb-3">
+
+                    <label for="archivo" class="form-label">Archivo*</label>
+                    <input class="form-control form-control-file" name="archivo" type="file" id="archivo">
+                    <iframe src="{{asset('storage').'/'.$empleados->archivo}}" alt="" Width="450" Height="400"></iframe>
+                </div>
+
+                @error('archivo')
+                <p class="border border-red-500 rounded-md bg-red-100 w-full text-red-500 p-2 my-2">
+                    * {{$message}}</p>
+                @enderror
 
 
-                <button type="button" id="enviarr"
+                <button type="submit" id="enviarr"
                         class="my-3 w-full btn btn-outline-primary p-2 font-semibold rounded text-black hover:bg-600 ">
                     Modificar
                 </button>
@@ -122,39 +128,41 @@
 
             <script>
                 $(document).ready(function () {
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });
+                    $("#form").submit(function (e) {
+                        e.preventDefault();
 
-                    $("#enviarr").click(function () {
-
+                        var formulario = new FormData(this);
                         var boletinCheck = document.getElementById('boletinCheck');
                         var boletin = document.getElementById('boletin');
-
+                        //console.log(formulario);
                         if (boletinCheck.checked == false) {
                             boletin.value = 0;
                         }
-                        var form = $("#form").serialize();
-
-
                         $.ajax({
-                            url: '{{ route('empleados.update', $empleados->id) }}',
-                            data: form,
-                            type: 'PUT',
-                            dataType: 'json',
+
+                            url: '{{route('empleados.update',$empleados->id)}}',
+                            type: 'POST',
+                            data: formulario,
+                            cache: false,
+                            contentType: false,
+                            processData: false,
                             success: function (data) {
                                 console.log(data);
 
-                                if(data.success == 'true'){
+                                if (data.success == 'true') {
 
                                     swal.fire(" ¡Empleado actualizado! ", " Empleado Actualizado correctamente ", "success").then(() => {
                                         window.location.href = "{{ route('empleados.index') }}"
                                     });
-
-
-                                }else{
+                                } else {
                                     swal.fire(" ¡Empleado no actualizado! " + data.mensaje,
                                         "Complete toda la información y valide los datos", "error");
                                 }
-
-
 
                             },
 
