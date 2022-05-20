@@ -8,7 +8,9 @@
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
             <a href="{{route('empleados.create')}}" class="btn btn-primary me-md-2" type="button" id="agregar"><i
                     class="fas fa-user-plus"></i>Agregar</a>
-       </div>
+            <a href="/exportPdf" class="btn btn-danger me-md-2"><i class="fas fa-file-pdf"></i></a>
+        </div>
+
         <div class="modal-content">
             <div class="overflow-auto lg:overflow-visible">
                <div class="text-center flex-auto">
@@ -107,7 +109,7 @@
                 "scrollX": true,
                 dom: 'Bfrtip',
                 buttons: [
-                    'copy','excel', 'pdf', 'print'
+                    'excel','print'
                 ]
 
         /*  pageLength : 5,

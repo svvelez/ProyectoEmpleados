@@ -19,7 +19,7 @@ class Emple extends Model
         'sexo' => 'required',
         /*'boletin' => 'required',*/
         'descripcion' => 'required',
-        //'archivo'=>'required',
+        'archivo'=>'required',
         'roles' => 'required',
 
         ];
@@ -31,7 +31,7 @@ class Emple extends Model
         'sexo.required' => 'Seleccione sexo',
         'descripcion.required' => 'Ingrese descripción',
         'roles.required' => 'Seleccione el rol',
-        //'archivo.required'=>'Seleccione una imagen',
+        'archivo.required'=>'Seleccione un archivo',
         'email.email' => 'ingrese un formato correcto de email',
 
     ];

@@ -2,7 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmpleadoController;
-
+use App\Mail\NotificationMailable;
+use Illuminate\Support\Facades\Mail;
 
  Route::get('/', function () {
 
@@ -12,5 +13,6 @@ use App\Http\Controllers\EmpleadoController;
 
 
 Route::resource('empleados',EmpleadoController::class);
+Route::get('/exportPdf',[EmpleadoController::class,'exportPdf'])->name('exportPdf');
 
 

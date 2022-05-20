@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Validator;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TestMail;
+use App\Mail\NotificationMailable;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class EmpleadoController extends Controller
 {
@@ -62,7 +65,13 @@ class EmpleadoController extends Controller
                 'empleado_id' => $emplead->id
 
             ]);
+
         }
+        $destino_nombre=$request->nombre;
+        $destino_email=$request->email;
+        $email = new \App\Mail\NotificationMailable($emplead);
+        Mail::to($destino_email)->send($email);
+
         return response()->json(['success' => 'true', 'mensaje' => 'hola']);
     }
 
@@ -124,5 +133,11 @@ class EmpleadoController extends Controller
 
         return redirect()->route('empleados.index')->with('eliminar', 'ok');
     }
+    public function exportPdf(){
+           $emplead = Emple::all();
 
+           view()->share('emplead',$emplead);
+           $pdf = PDF::loadView('empleados.downloandPdf');
+           return $pdf->download('emplead.pdf');
+   }
 }
